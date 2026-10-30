@@ -95,6 +95,7 @@ class DeclaredData:
     temporal_observations: int = 1
     has_cloud_mask: bool = False
     has_ground_truth_reference: bool = False
+    has_clear_optical_reference: bool = False
     image_height: Optional[int] = None
     image_width: Optional[int] = None
 

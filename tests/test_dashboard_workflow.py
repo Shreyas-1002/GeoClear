@@ -319,7 +319,7 @@ class TestDashboardWorkflowIntegration(unittest.TestCase):
         self.assertIn("dsen2_cr", exec_ids)
         self.assertTrue(report.get_result("ecrformer").is_executable)
         self.assertTrue(report.get_result("dsen2_cr").is_executable)
-        self.assertFalse(report.get_result("diffcr").is_compatible)
+        self.assertIsNone(report.get_result("diffcr"))
 
         # 2. Step 2: Generate synthetic input patch
         sar, cloudy, clean_ref = generate_synthetic_verification_patch(height=128, width=128, seed=42)
@@ -470,7 +470,10 @@ class TestDashboardInferenceState(unittest.TestCase):
 
     def test_streamlit_rendering_regression(self):
         """End-to-end Streamlit AppTest verifies selecting ECRformer or DSen2-CR renders Steps 4-8 without exception."""
-        from streamlit.testing.v1 import AppTest
+        try:
+            from streamlit.testing.v1 import AppTest
+        except ImportError:
+            self.skipTest("Streamlit not installed in environment")
 
         at = AppTest.from_file("app.py", default_timeout=30)
         at.run()
