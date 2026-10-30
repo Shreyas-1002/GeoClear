@@ -99,7 +99,6 @@ class CompatibilityEngine:
         # 2. Sensor compatibility evaluation
         if req.required_sensors:
             # Check if declared sensors intersect with required sensors
-            # If user has GENERIC_RGB and model accepts GENERIC_RGB or SENTINEL_2, handle gracefully
             declared_sensor_match = any(s in req.required_sensors for s in declared_data.sensors)
             if not declared_sensor_match:
                 missing_inputs.append(
@@ -112,13 +111,11 @@ class CompatibilityEngine:
 
         # 3. Spectral bands evaluation (strictly rule-based; never infer missing bands)
         if req.required_optical_bands:
-            # Normalize user band names for flexible comparison (e.g. 'B4' vs 'R')
             declared_bands = set(declared_data.optical_bands)
             required_bands = set(req.required_optical_bands)
 
             # Map generic RGB aliases if model accepts generic RGB
             if required_bands == {"B4", "B3", "B2"} and {"R", "G", "B"}.issubset(declared_bands):
-                # User declared R, G, B which satisfies RGB requirement
                 pass
             else:
                 missing_bands = required_bands - declared_bands
@@ -190,7 +187,7 @@ class CompatibilityEngine:
         # Determine input compatibility
         is_compatible = len(exclusion_reasons) == 0
 
-        # Determine operational execution readiness (independent of input compatibility!)
+        # Determine operational execution readiness
         if not model.checkpoint_present_locally:
             execution_blockers.append(
                 "Pretrained weights are not present on disk (external download required)."
@@ -230,9 +227,10 @@ class CompatibilityEngine:
                 "Verify usage permissions before commercial deployment."
             )
 
-        if not declared_data.has_ground_truth_reference:
+        has_ref = declared_data.has_ground_truth_reference or getattr(declared_data, "has_clear_optical_reference", False)
+        if not has_ref:
             notes.append(
-                "No cloud-free reference image provided. Reference-dependent metrics (PSNR, SSIM, MAE, RMSE) "
+                "No clear optical reference for evaluation provided. Reference-dependent metrics (PSNR, SSIM, MAE, RMSE) "
                 "cannot be computed and will not be displayed."
             )
 

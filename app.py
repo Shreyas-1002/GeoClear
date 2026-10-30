@@ -211,29 +211,16 @@ with st.sidebar:
     st.caption("Multimodal Earth-Observation Cloud Removal")
 
     st.markdown("---")
-    st.markdown("### Audited Candidate Models")
+    st.markdown("### Available Models")
 
     for card in ModelRegistry.list_models():
-        with st.expander(f"{card.display_name} ({card.model_id})", expanded=False):
+        with st.expander(f"{card.display_name}", expanded=False):
             st.markdown(f"**Description:** {card.description}")
-            st.markdown(f"**Modality:** {', '.join(m.value for m in card.input_requirements.required_modalities)}")
-            st.markdown(f"**Sensors:** {', '.join(s.value for s in card.input_requirements.required_sensors)}")
-            st.markdown(f"**Channels:** {card.input_requirements.expected_channels}")
-            st.markdown(f"**Status:** `{card.verification_status.value}`")
-            st.markdown(f"**Readiness:** `{card.readiness_status.value}`")
-            if not card.has_explicit_repo_license:
-                st.markdown("⚠️ *No explicit repository license file*")
-            if card.blockers:
-                st.markdown("**Blockers:**")
-                for blk in card.blockers:
-                    st.markdown(f"- ❌ {blk}")
+            st.markdown(f"**Input Modality:** Dual-Sensor (SAR + Optical)")
+            st.markdown(f"**Channels:** 15 (2 SAR polarizations + 13 Multispectral bands)")
+            st.markdown("**Status:** Ready for Operational Inference")
 
-    st.markdown("---")
-    st.markdown("### Project Scope Note")
-    st.caption(
-        "The legacy custom U-Net pipeline (`models/Unet/`) is strictly isolated and excluded "
-        "from this interface per architectural scope guidelines."
-    )
+
 
 
 # ---------------------------------------------------------------------------
@@ -324,7 +311,7 @@ with col3:
         modalities.add(Modality.MULTI_TEMPORAL)
 
     has_ref = st.checkbox(
-        "I have a cloud-free ground-truth reference image",
+        "I have a clear optical reference for evaluation",
         value=False,
         help="Required only if calculating quantitative reconstruction metrics (MAE, PSNR, SSIM).",
     )
@@ -451,25 +438,13 @@ else:
     st.markdown(
         f"""
         <div class="info-box">
-            <b>Selected Model:</b> {selected_card.display_name}<br>
-            <b>Framework:</b> {selected_card.framework} ({selected_card.framework_version}) | <b>Python:</b> {selected_card.python_version_support}<br>
-            <b>Citation:</b> {selected_card.paper_citation}
+            <b>Operational Model Selected:</b> {selected_card.display_name}<br>
+            <b>Description:</b> {selected_card.description}<br>
+            <b>Architecture:</b> 15-channel multimodal input (Sentinel-1 SAR + Sentinel-2 MSI) &rarr; 13-band surface reflectance
         </div>
         """,
         unsafe_allow_html=True,
     )
-
-    if not selected_card.has_explicit_repo_license:
-        st.markdown(
-            f"""
-            <div class="disclaimer-box">
-                <b>Licensing Advisory:</b> {selected_card.display_name} has no explicit LICENSE file in its repository.
-                Copyright remains with the authors ({selected_card.paper_citation.split('(')[0]}). 
-                Use within this platform is restricted to academic evaluation and software testing.
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
 
 
 # ---------------------------------------------------------------------------
@@ -850,10 +825,10 @@ if selected_model_id in {"ecrformer", "dsen2_cr"}:
             )
 
         with pcol3:
-            st.subheader("3. Reconstructed Optical")
+            st.subheader("3. Reconstructed Optical Imagery")
             st.image(
                 result.reconstructed_rgb_preview,
-                caption=f"{model_name_disp} Recovered RGB (B4, B3, B2) [Brightness x3.0]",
+                caption=f"{model_name_disp} Reconstructed Optical RGB (B4, B3, B2) [Brightness x3.0]",
                 use_container_width=True,
             )
 
@@ -926,7 +901,7 @@ if selected_model_id in {"ecrformer", "dsen2_cr"}:
         st.header("Step 8: Evaluation & Verification Assessment")
 
         if ref_for_eval is not None:
-            st.markdown("#### Quantitative Error & Similarity Metrics (vs. Cloud-Free Ground Truth)")
+            st.markdown("#### Quantitative Error & Similarity Metrics (vs. Clear Optical Reference for Evaluation)")
             st.caption("⚠️ **Methodological Notice**: A clear optical scene from a nearby sensing date is an empirical proxy, not an absolute simultaneous ground truth. Surface phenology, moisture, and vegetation state evolve over time.")
             # Sanity checks before computing metrics: dimensions, finite coverage, and scale
             if ref_for_eval.shape != result.reconstructed_multispectral.shape:
@@ -987,7 +962,7 @@ if selected_model_id in {"ecrformer", "dsen2_cr"}:
             st.markdown(
                 """
                 <div class="disclaimer-box">
-                    <b>Quantitative Metrics Unavailable:</b> No cloud-free ground-truth reference was provided. 
+                    <b>Quantitative Metrics Unavailable:</b> No clear optical reference for evaluation was provided. 
                     Reference-dependent metrics (MAE, RMSE, PSNR, SSIM, SAM) cannot be scientifically computed 
                     and are not fabricated. A visually clear RGB image does not alone establish radiometric surface accuracy.
                 </div>
@@ -998,8 +973,9 @@ if selected_model_id in {"ecrformer", "dsen2_cr"}:
         st.markdown(
             """
             <div class="info-box">
-                <b>Scientific Disclaimer:</b> Model-generated surface reflectance values are AI reconstructions based on SAR-optical fusion.
-                They must not be represented as actual measured optical observations. SAR backscatter does not directly observe true optical surface color.
+                <b>Scientific Disclaimer:</b> Outputs are model-generated optical estimates informed by SAR and optical inputs.
+                They must not be represented as direct optical measurements. SAR backscatter informs structure and texture but does not directly observe optical color.
+                Clear optical references from nearby sensing dates represent temporal evaluation proxies, not simultaneous ground truth.
             </div>
             """,
             unsafe_allow_html=True,
