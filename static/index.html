@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoClear — Earth Observation AI Platform</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="/static/css/style.css">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2338bdf8'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z'/></svg>">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">GeoClear</div>
+          <div class="brand-subtitle">Multimodal EO Platform</div>
+        </div>
+      </div>
+
+      <ul class="nav-menu">
+        <li class="nav-item active" data-view="home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          <span>Home / Overview</span>
+        </li>
+        <li class="nav-item" data-view="input">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+          <span>Satellite Data Input</span>
+        </li>
+        <li class="nav-item" data-view="models">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+          <span>Model Selection</span>
+        </li>
+        <li class="nav-item" data-view="inference">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          <span>Reconstruction</span>
+        </li>
+        <li class="nav-item" data-view="visuals">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          <span>Visual Results</span>
+        </li>
+        <li class="nav-item" data-view="metrics">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          <span>Evaluation Metrics</span>
+        </li>
+        <li class="nav-item" data-view="export">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <span>Export / Download</span>
+        </li>
+        <li class="nav-item" data-view="benchmarks">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+          <span>Munich & Mumbai</span>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-models">Available Models</div>
+        <div>
+          <span class="model-pill">ECRformer-Light</span>
+          <span class="model-pill secondary">DSen2-CR</span>
+        </div>
+        <div style="font-size: 0.72rem; color: var(--text-dim); margin-top: 8px;">
+          CPU Forward Execution | 15 Channels
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+      
+      <!-- Top Sticky Header -->
+      <header class="top-header">
+        <div class="header-status">
+          <div class="status-badge">
+            <span class="status-indicator" id="status-dot"></span>
+            <span id="header-dataset-label">No Data Loaded</span>
+          </div>
+          <div class="status-badge">
+            <span>Model:</span>
+            <strong id="header-model-label" style="color: var(--accent-cyan);">ECRformer-Light</strong>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button class="btn btn-secondary btn-sm" id="btn-quick-load-synthetic">
+            <span>🧪 Load Synthetic</span>
+          </button>
+          <button class="btn btn-primary btn-sm" id="btn-quick-reconstruct">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <span>Execute Cloud Removal</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Scrollable Area -->
+      <main class="content-area">
+
+        <!-- ===================================================================
+             SECTION 1: HOME / PROJECT OVERVIEW
+             =================================================================== -->
+        <section id="view-home" class="view-section active">
+          
+          <div class="hero-card">
+            <h1 class="hero-title">GeoClear: Multimodal Satellite Cloud Removal</h1>
+            <p class="hero-description">
+              An open, data-aware Earth Observation AI platform designed to reconstruct cloud-occluded 
+              multispectral surface reflectance by fusing active <strong>Copernicus Sentinel-1 Synthetic Aperture Radar (SAR)</strong> 
+              with <strong>Sentinel-2 Optical (MSI)</strong> imagery.
+            </p>
+            <div class="hero-badges">
+              <span class="tag-badge">🛰️ Sentinel-1 C-SAR (5.405 GHz)</span>
+              <span class="tag-badge">🌈 Sentinel-2 MSI (13 Spectral Bands)</span>
+              <span class="tag-badge">⚡ Real CPU Inference</span>
+              <span class="tag-badge">📐 10m Pixel Resolution</span>
+              <span class="tag-badge">🔬 Zero-Fabrication Metrics Policy</span>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                The Cloud Occlusion Challenge
+              </div>
+              <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 12px;">
+                Persistent cloud contamination contaminates over <strong>67% of global Earth surface satellite imagery</strong> at any moment. 
+                During monsoon and tropical seasons, cloud cover exceeds 80–90%, blinding optical instruments for weeks or months.
+              </p>
+              <p style="color: var(--text-muted); font-size: 0.92rem;">
+                Traditional optical compositing fails during prolonged overcast periods, while pure GAN inpainting hallucinates plausible textures 
+                without physical basis. GeoClear overcomes this by incorporating cloud-penetrating radar.
+              </p>
+            </div>
+
+            <div class="card">
+              <div class="card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                Multimodal SAR-Optical Fusion
+              </div>
+              <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 12px;">
+                <strong>Sentinel-1 C-band SAR</strong> (5.405 GHz, &lambda; &approx; 5.55 cm) passes unaffected through atmospheric clouds, rain, and haze. 
+                The backscatter signals (&sigma;<sub>0</sub> in dB for VV and VH polarizations) capture surface roughness, moisture, and urban double-bounce reflections.
+              </p>
+              <p style="color: var(--text-muted); font-size: 0.92rem;">
+                By coupling SAR geometric structural priors with residual optical albedo, our deep learning architectures reconstruct all 13 multispectral bands 
+                without geometric hallucinations.
+              </p>
+            </div>
+          </div>
+
+          <!-- Architecture & Models Summary -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Available Operational Models</div>
+              <span class="status-badge"><span class="status-indicator ready"></span> 2 Verified Architectures</span>
+            </div>
+            
+            <div class="grid-2">
+              <div style="background: rgba(15, 23, 42, 0.5); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 18px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <h3 style="font-family: var(--font-heading); font-size: 1.15rem; color: var(--accent-cyan);">ECRformer-Light</h3>
+                  <span class="tag-badge" style="color: #38bdf8;">Vision Transformer</span>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 12px;">
+                  Semantic-decoupled cross-attention Transformer with multiscale refinement heads. Separates SAR and optical branches 
+                  to prevent microwave speckle corruption while delineating crisp edge boundaries.
+                </p>
+                <div style="font-size: 0.82rem; font-family: var(--font-mono); color: var(--text-dim);">
+                  Params: ~3.70M | Latency: ~3.9s CPU | Input: 15 Channels | ISPRS JPRS 2026
+                </div>
+              </div>
+
+              <div style="background: rgba(15, 23, 42, 0.5); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 18px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <h3 style="font-family: var(--font-heading); font-size: 1.15rem; color: #a5b4fc;">DSen2-CR (CARL)</h3>
+                  <span class="tag-badge" style="color: #a5b4fc;">Deep Residual ResNet</span>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 12px;">
+                  16-block residual convolutional network trained with Cloud-Adaptive Regularized Loss (CARL). Converted from Keras 
+                  to native PyTorch with verified exact numerical parameter equivalence (MAE = 0.0).
+                </p>
+                <div style="font-size: 0.82rem; font-family: var(--font-mono); color: var(--text-dim);">
+                  Params: ~18.87M | Latency: ~11.5s CPU | Input: 15 Channels | ISPRS JPRS 2020
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scientific Disclaimer -->
+          <div class="disclaimer-box">
+            <strong>Scientific Disclaimer:</strong> Outputs are model-generated optical estimates informed by SAR and optical inputs. 
+            They must not be cited or treated as direct optical measurements. SAR backscatter informs structural geometry and texture but does not directly observe optical color. 
+            Clear optical references from nearby sensing dates represent empirical temporal evaluation proxies, not simultaneous ground truth.
+          </div>
+
+        </section>
+
+
+        <!-- ===================================================================
+             SECTION 2: SATELLITE DATA INPUT
+             =================================================================== -->
+        <section id="view-input" class="view-section">
+          
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Satellite Data Ingestion</h2>
+                <div class="card-subtitle">Load co-registered Sentinel-1 SAR and Sentinel-2 optical imagery into server memory.</div>
+              </div>
+            </div>
+
+            <!-- Ingestion Mode Tabs -->
+            <div class="tab-nav">
+              <button class="tab-btn active" data-tab="tab-local">📁 Local Directory</button>
+              <button class="tab-btn" data-tab="tab-presets">🌍 Benchmark Presets</button>
+              <button class="tab-btn" data-tab="tab-synthetic">🧪 Synthetic Generator</button>
+              <button class="tab-btn" data-tab="tab-upload">📤 Browser Upload</button>
+            </div>
+
+            <!-- Tab 1: Local Directory -->
+            <div id="tab-local" class="tab-pane active">
+              <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+                Reads GeoTIFFs directly from local disk. Non-destructively inspects metadata, verifies spatial grids, and parses GEE manifests (CSV or JSON).
+              </p>
+              
+              <div class="grid-2" style="align-items: flex-end;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label">Local Folder Path:</label>
+                  <input type="text" id="input-local-dir" class="form-input" value="data/real_patch">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                  <button class="btn btn-secondary" id="btn-inspect-local">🔍 Inspect Folder</button>
+                  <button class="btn btn-primary" id="btn-load-local">📥 Load Validated Patch</button>
+                </div>
+              </div>
+
+              <!-- Folder Inspection Report Area -->
+              <div id="local-inspect-results" style="margin-top: 20px; display: none;">
+                <div style="padding: 16px; background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <strong style="color: var(--accent-cyan);">Discovery & Validation Report:</strong>
+                    <span id="inspect-valid-badge" class="tag-badge">Checking...</span>
+                  </div>
+                  <div class="grid-3" id="inspect-files-grid">
+                    <!-- Dynamic file badges -->
+                  </div>
+                  <div id="inspect-manifest-details" style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">
+                    <!-- Manifest metadata -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 2: Benchmark Presets -->
+            <div id="tab-presets" class="tab-pane" style="display: none;">
+              <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+                Quickly load authentic real-world satellite benchmark datasets exported from Google Earth Engine.
+              </p>
+              
+              <div class="grid-2">
+                <div class="card" style="margin-bottom: 0; background: rgba(15, 23, 42, 0.6);">
+                  <h3 style="color: var(--accent-cyan); font-size: 1.1rem; margin-bottom: 6px;">Mumbai Dadar, India</h3>
+                  <div style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;">
+                    Dense urban corridor under <strong>99.58% monsoon overcast cloud cover</strong>. 
+                    Target: 2023-06-16 | SAR: 2023-06-11 | Clear Reference: 2023-06-06 (-10 days). Grid: 256x256, 10m GSD (EPSG:32643).
+                  </div>
+                  <button class="btn btn-secondary btn-sm" id="btn-preset-mumbai">Load Mumbai Dadar Patch</button>
+                </div>
+
+                <div class="card" style="margin-bottom: 0; background: rgba(15, 23, 42, 0.6);">
+                  <h3 style="color: #a5b4fc; font-size: 1.1rem; margin-bottom: 6px;">Munich, Germany</h3>
+                  <div style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;">
+                    Metropolitan and rural surroundings under <strong>100% thick cumulus cloud cover</strong>. 
+                    Target: 2023-07-12 | SAR: 2023-07-10 | Clear Reference: 2023-06-25 (-17 days). Grid: 256x256, 10m GSD (EPSG:32632).
+                  </div>
+                  <button class="btn btn-secondary btn-sm" id="btn-preset-munich">Load Munich Benchmark</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 3: Synthetic Generator -->
+            <div id="tab-synthetic" class="tab-pane" style="display: none;">
+              <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+                Generate a multi-band synthetic test patch (128x128 pixels, 15 channels) with deterministic physics 
+                to test model inference and graph execution without downloading large satellite rasters.
+              </p>
+              <button class="btn btn-primary" id="btn-generate-synthetic">🧪 Generate Synthetic 128x128 Patch</button>
+            </div>
+
+            <!-- Tab 4: Manual Browser Upload -->
+            <div id="tab-upload" class="tab-pane" style="display: none;">
+              <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+                Upload co-registered GeoTIFFs or NumPy arrays directly from your browser.
+              </p>
+              
+              <div class="grid-3">
+                <div class="form-group">
+                  <label class="form-label">Sentinel-1 SAR (2 Bands: VV, VH):</label>
+                  <input type="file" id="upload-sar-file" class="form-input" accept=".tif,.tiff,.npz,.npy">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Sentinel-2 Optical (13 Bands: B1..B12):</label>
+                  <input type="file" id="upload-opt-file" class="form-input" accept=".tif,.tiff,.npz,.npy">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Clear Reference (Optional, 13 Bands):</label>
+                  <input type="file" id="upload-ref-file" class="form-input" accept=".tif,.tiff,.npz,.npy">
+                </div>
+              </div>
+              <button class="btn btn-primary" id="btn-submit-upload">Upload & Ingest Rasters</button>
+            </div>
+
+          </div>
+
+          <!-- Data Declaration & Strict Compatibility Check -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Physics & Data Compatibility Declaration</h3>
+              <button class="btn btn-secondary btn-sm" id="btn-recheck-compat">Re-Evaluate Compatibility</button>
+            </div>
+            
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 18px;">
+              Input eligibility is derived strictly from real sensor data declarations. Models are never claimed operational without verified execution.
+            </p>
+
+            <div class="grid-3">
+              <div>
+                <label class="form-label">Sensors & Instruments</label>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <label style="display: flex; align-items: center; gap: 8px; font-size: 0.88rem;">
+                    <input type="checkbox" id="decl-s2" checked> Sentinel-2 MSI Optical
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 8px; font-size: 0.88rem;">
+                    <input type="checkbox" id="decl-s1" checked> Sentinel-1 C-SAR (Radar)
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label class="form-label">Spectral & Polarization Bands</label>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <label style="display: flex; align-items: center; gap: 8px; font-size: 0.88rem;">
+                    <input type="radio" name="decl-bands" value="13" checked> All 13 Sentinel-2 Bands
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 8px; font-size: 0.88rem;">
+                    <input type="radio" name="decl-bands" value="3"> RGB Bands Only (B4, B3, B2)
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 8px; font-size: 0.88rem; margin-top: 4px;">
+                    <input type="checkbox" id="decl-vv" checked> VV &nbsp;
+                    <input type="checkbox" id="decl-vh" checked> VH Polarizations
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label class="form-label">Reference & Dimensions</label>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <label style="display: flex; align-items: center; gap: 8px; font-size: 0.88rem;">
+                    <input type="checkbox" id="decl-ref" checked> Clear optical reference for evaluation
+                  </label>
+                  <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px;">
+                    <span style="font-size: 0.82rem; color: var(--text-dim);">Size:</span>
+                    <select id="decl-dim" class="form-input" style="padding: 4px 8px; width: 120px;">
+                      <option value="256">256 x 256</option>
+                      <option value="128">128 x 128</option>
+                      <option value="512">512 x 512</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Live Compatibility Outcome -->
+            <div id="compat-results-box" style="margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
+              <div style="font-size: 0.85rem; color: var(--accent-emerald); font-weight: 600;">
+                ✅ 2 Operational Models Compatible with declared multimodal Sentinel-1 + Sentinel-2 inputs:
+              </div>
+              <div style="display: flex; gap: 10px; margin-top: 8px;">
+                <span class="tag-badge" style="color: #38bdf8;">ECRformer-Light: Input Compatible & Executable</span>
+                <span class="tag-badge" style="color: #a5b4fc;">DSen2-CR: Input Compatible & Executable</span>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ===================================================================
+             SECTION 3: MODEL SELECTION
+             =================================================================== -->
+        <section id="view-models" class="view-section">
+          
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Available Models</h2>
+                <div class="card-subtitle">Select an operational deep learning model to perform multimodal cloud removal.</div>
+              </div>
+            </div>
+
+            <div class="grid-2" id="model-cards-container">
+              
+              <!-- Model Card 1: ECRformer-Light -->
+              <div class="model-card-item selected" data-model="ecrformer">
+                <span class="model-badge">Operational</span>
+                <div class="model-name">ECRformer-Light</div>
+                <div class="model-type">Vision Transformer with Cross-Covariance Attention</div>
+                <p class="model-desc">
+                  Separates SAR microwave and optical branches through a decoupled encoder, avoiding speckle noise interference. 
+                  Applies Multi-Dilation Window Attention (MDWA) and multiscale refine heads to achieve fast inference with crisp boundaries.
+                </p>
+                <div class="model-specs">
+                  <div class="spec-item"><span class="spec-label">Parameters</span><span class="spec-val">~3.70 Million</span></div>
+                  <div class="spec-item"><span class="spec-label">Avg CPU Latency</span><span class="spec-val">~3.91 Seconds</span></div>
+                  <div class="spec-item"><span class="spec-label">Input / Output</span><span class="spec-val">15 In &rarr; 13 Out</span></div>
+                  <div class="spec-item"><span class="spec-label">Citation</span><span class="spec-val">Zhang et al. (ISPRS 2026)</span></div>
+                </div>
+                <button class="btn btn-primary btn-sm btn-select-model" style="margin-top: 16px; width: 100%;">Active Model</button>
+              </div>
+
+              <!-- Model Card 2: DSen2-CR -->
+              <div class="model-card-item" data-model="dsen2_cr">
+                <span class="model-badge">Operational</span>
+                <div class="model-name">DSen2-CR (CARL)</div>
+                <div class="model-type">Deep Residual Convolutional Network (16 Blocks)</div>
+                <p class="model-desc">
+                  16-block residual architecture with Cloud-Adaptive Regularized Loss (CARL). Converted from official Keras weights 
+                  to native PyTorch with verified exact parameter equivalence (MAE = 0.0). Delivers smooth, conservative spectral reflectance.
+                </p>
+                <div class="model-specs">
+                  <div class="spec-item"><span class="spec-label">Parameters</span><span class="spec-val">~18.87 Million</span></div>
+                  <div class="spec-item"><span class="spec-label">Avg CPU Latency</span><span class="spec-val">~11.69 Seconds</span></div>
+                  <div class="spec-item"><span class="spec-label">Input / Output</span><span class="spec-val">15 In &rarr; 13 Out</span></div>
+                  <div class="spec-item"><span class="spec-label">Citation</span><span class="spec-val">Meraner et al. (ISPRS 2020)</span></div>
+                </div>
+                <button class="btn btn-secondary btn-sm btn-select-model" style="margin-top: 16px; width: 100%;">Select Model</button>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Comparison Table -->
+          <div class="card">
+            <h3 class="card-title" style="margin-bottom: 14px;">Technical Comparison</h3>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Feature</th>
+                  <th>ECRformer-Light</th>
+                  <th>DSen2-CR (CARL)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Architecture Family</td>
+                  <td>Vision Transformer (Cross-Attention)</td>
+                  <td>Deep Residual Network (CNN)</td>
+                </tr>
+                <tr>
+                  <td>Trainable Parameters</td>
+                  <td class="mono">3,702,669 (~3.70M)</td>
+                  <td class="mono">18,873,613 (~18.87M)</td>
+                </tr>
+                <tr>
+                  <td>Channel Order</td>
+                  <td class="mono">[2 SAR (VV, VH), 13 Optical (B1..B12)]</td>
+                  <td class="mono">[13 Optical (B1..B12), 2 SAR (VV, VH)]</td>
+                </tr>
+                <tr>
+                  <td>CPU Inference Time (256x256)</td>
+                  <td class="mono" style="color: var(--accent-cyan); font-weight: 600;">~3.91 - 4.37 s</td>
+                  <td class="mono">~10.31 - 11.69 s</td>
+                </tr>
+                <tr>
+                  <td>Spectral Sharpness</td>
+                  <td>High (Crisp structural edges)</td>
+                  <td>Moderate (Smooth regularization)</td>
+                </tr>
+                <tr>
+                  <td>Upstream License</td>
+                  <td>Academic Evaluation</td>
+                  <td>GNU GPLv3 (Copyleft)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </section>
+
+
+        <!-- ===================================================================
+             SECTION 4: RECONSTRUCTION / INFERENCE
+             =================================================================== -->
+        <section id="view-inference" class="view-section">
+          
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Execute Cloud Removal</h2>
+                <div class="card-subtitle">Run the forward pass on loaded satellite data on CPU.</div>
+              </div>
+              <div style="font-size: 0.85rem; color: var(--text-dim);" id="inference-model-indicator">
+                Model: <strong>ECRformer-Light</strong>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 24px;">
+              <button class="btn btn-primary btn-lg" id="btn-run-inference">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                <span>Execute Cloud Removal Forward Pass</span>
+              </button>
+              <div id="inference-spinner" style="display: none; align-items: center; gap: 10px; color: var(--accent-cyan); font-weight: 500;">
+                <div class="status-indicator running"></div>
+                <span>Executing neural network forward pass on CPU...</span>
+              </div>
+            </div>
+
+            <!-- Post-Run Telemetry Bar -->
+            <div class="telemetry-bar" id="telemetry-hud" style="display: none;">
+              <div class="telemetry-item">
+                <span class="telemetry-label">Inference Latency</span>
+                <span class="telemetry-val" id="hud-latency">-- ms</span>
+              </div>
+              <div class="telemetry-item">
+                <span class="telemetry-label">Compute Device</span>
+                <span class="telemetry-val" id="hud-device">CPU</span>
+              </div>
+              <div class="telemetry-item">
+                <span class="telemetry-label">Output Reflectance Range</span>
+                <span class="telemetry-val" id="hud-range">[0.00, 1.00]</span>
+              </div>
+              <div class="telemetry-item">
+                <span class="telemetry-label">Finite Value Check</span>
+                <span class="telemetry-val" style="color: var(--accent-emerald);" id="hud-finite">✅ Valid</span>
+              </div>
+            </div>
+
+            <div id="run-artifacts-notification" class="info-box" style="display: none;">
+              <strong>Traceable Output Package Saved to Disk:</strong>
+              <div id="saved-paths-list" style="margin-top: 6px; font-family: var(--font-mono); font-size: 0.8rem;"></div>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ===================================================================
+             SECTION 5: VISUAL RESULTS & COMPARISON
+             =================================================================== -->
+        <section id="view-visuals" class="view-section">
+          
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Interactive Before / After Comparison</h2>
+                <div class="card-subtitle">Drag the slider to directly compare the cloudy input against reconstructed optical imagery.</div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-secondary btn-sm comp-mode-btn active" data-mode="cloudy-recon">Cloudy vs Reconstructed</button>
+                <button class="btn btn-secondary btn-sm comp-mode-btn" data-mode="sar-recon">SAR vs Reconstructed</button>
+                <button class="btn btn-secondary btn-sm comp-mode-btn" data-mode="ref-recon">Reference vs Reconstructed</button>
+              </div>
+            </div>
+
+            <!-- Draggable Comparison Slider -->
+            <div class="comparison-container" id="slider-container">
+              <img id="comp-base-img" class="comparison-image" src="" alt="Reconstructed Optical Imagery">
+              <div class="comparison-overlay" id="comp-overlay">
+                <img id="comp-overlay-img" src="" alt="Cloudy Input">
+              </div>
+              <div class="comparison-handle" id="comp-handle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+              <div class="comparison-badge badge-left" id="badge-left-label">Input Cloudy Optical</div>
+              <div class="comparison-badge badge-right" id="badge-right-label">Reconstructed Optical Imagery</div>
+            </div>
+
+            <div style="text-align: center; font-size: 0.8rem; color: var(--text-dim);">
+              Use your mouse or touch to drag the cyan handle horizontally across the footprint.
+            </div>
+          </div>
+
+          <!-- 4-Grid Synchronized Showcase -->
+          <div class="card">
+            <h3 class="card-title" style="margin-bottom: 16px;">Synchronized Multimodal Showcase</h3>
+            <div class="preview-grid">
+              
+              <div class="preview-box">
+                <div class="preview-box-header">
+                  <span>1. Input Cloudy Optical</span>
+                  <span class="tag-badge">Sentinel-2</span>
+                </div>
+                <img id="grid-cloudy-img" src="" alt="Input Cloudy Optical">
+                <div class="preview-caption">True-Color RGB (B4, B3, B2) with 3.0x contrast stretch. Total optical cloud occlusion.</div>
+              </div>
+
+              <div class="preview-box">
+                <div class="preview-box-header">
+                  <span>2. Sentinel-1 SAR</span>
+                  <span class="tag-badge">Microwave</span>
+                </div>
+                <img id="grid-sar-img" src="" alt="Sentinel-1 SAR">
+                <div class="preview-caption">False-Color Composite (R: VV, G: VH, B: ratio). Unaffected by atmospheric cloud cover.</div>
+              </div>
+
+              <div class="preview-box">
+                <div class="preview-box-header">
+                  <span>3. Reconstructed Optical</span>
+                  <span class="tag-badge" style="color: var(--accent-cyan);">AI Output</span>
+                </div>
+                <img id="grid-recon-img" src="" alt="Reconstructed Optical Imagery">
+                <div class="preview-caption">Reconstructed True-Color Optical surface reflectance (B4, B3, B2, 3.0x stretch).</div>
+              </div>
+
+              <div class="preview-box">
+                <div class="preview-box-header">
+                  <span>4. Clear Optical Reference</span>
+                  <span class="tag-badge" style="color: #a5b4fc;">Temporal Proxy</span>
+                </div>
+                <img id="grid-ref-img" src="" alt="Clear Optical Reference for Evaluation">
+                <div class="preview-caption" id="ref-caption-text">Clear optical scene from nearby sensing date (temporal evaluation proxy; not simultaneous ground truth).</div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- 13-Band Multispectral Explorer -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">13-Band Multispectral Explorer</h3>
+                <div class="card-subtitle">Inspect each reconstructed Sentinel-2 spectral channel individually.</div>
+              </div>
+            </div>
+
+            <div class="band-selector" id="band-pills-bar">
+              <!-- Dynamically populated band pills -->
+            </div>
+
+            <div class="grid-2" style="align-items: center;">
+              <div style="background: #000; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border-subtle); max-width: 400px; margin: 0 auto;">
+                <img id="band-preview-img" src="" alt="Spectral Band" style="width: 100%; aspect-ratio: 1/1; object-fit: contain;">
+              </div>
+              <div>
+                <h4 id="band-spec-title" style="font-family: var(--font-heading); font-size: 1.3rem; color: var(--accent-cyan); margin-bottom: 8px;">Band 4 — Red</h4>
+                <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;" id="band-spec-desc">Chlorophyll absorption band for vegetation delineation.</div>
+                
+                <table class="data-table" style="margin: 0;">
+                  <tbody>
+                    <tr><td>Central Wavelength</td><td class="mono" id="band-spec-wl">665 nm</td></tr>
+                    <tr><td>Ground Sampling Distance (GSD)</td><td class="mono" id="band-spec-gsd">10 m</td></tr>
+                    <tr><td>Reflectance Min</td><td class="mono" id="band-spec-min">0.0000</td></tr>
+                    <tr><td>Reflectance Max</td><td class="mono" id="band-spec-max">0.0000</td></tr>
+                    <tr><td>Reflectance Mean</td><td class="mono" id="band-spec-mean">0.0000</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+
+        <!-- ===================================================================
+             SECTION 6: EVALUATION METRICS
+             =================================================================== -->
+        <section id="view-metrics" class="view-section">
+          
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Quantitative Evaluation & Quality Verification</h2>
+                <div class="card-subtitle">Calculated strictly against the clear optical reference for evaluation.</div>
+              </div>
+            </div>
+
+            <!-- Zero fabrication alert (hidden if ref present) -->
+            <div id="metrics-unavail-notice" class="disclaimer-box" style="display: none;">
+              <strong>Quantitative Metrics Unavailable:</strong> No clear optical reference for evaluation was provided. 
+              Reference-dependent metrics (MAE, RMSE, PSNR, SSIM) cannot be scientifically computed and are not fabricated.
+            </div>
+
+            <!-- Metrics KPIs Grid -->
+            <div class="grid-4" id="metrics-kpi-grid">
+              <div class="metric-card">
+                <span class="metric-card-title">Multispectral MAE</span>
+                <span class="metric-card-val mae" id="kpi-mae">--</span>
+                <span class="metric-card-note">Mean Absolute Error across 13 bands</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-card-title">Multispectral RMSE</span>
+                <span class="metric-card-val rmse" id="kpi-rmse">--</span>
+                <span class="metric-card-note">Root Mean Squared Error</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-card-title">True-Color RGB PSNR</span>
+                <span class="metric-card-val psnr" id="kpi-psnr">-- dB</span>
+                <span class="metric-card-note">Peak Signal-to-Noise Ratio (dB)</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-card-title">True-Color RGB SSIM</span>
+                <span class="metric-card-val ssim" id="kpi-ssim">--</span>
+                <span class="metric-card-note">Structural Similarity Index (7x7 window)</span>
+              </div>
+            </div>
+
+            <!-- Per-Band Error Breakdown Table -->
+            <div style="margin-top: 28px;" id="per-band-error-section">
+              <h3 class="card-title" style="font-size: 1.1rem; margin-bottom: 12px;">Detailed Per-Band Errors (MAE & RMSE)</h3>
+              <table class="data-table" id="per-band-table">
+                <thead>
+                  <tr>
+                    <th>Band</th>
+                    <th>Spectral Channel</th>
+                    <th>Wavelength</th>
+                    <th>MAE</th>
+                    <th>RMSE</th>
+                  </tr>
+                </thead>
+                <tbody id="per-band-table-body">
+                  <!-- Filled dynamically -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Band 10 Physical Notice -->
+            <div class="info-box" style="margin-top: 20px;">
+              <strong>Investigation of Low Band 10 MAE:</strong> Band 10 (1375 nm) is located inside an intense atmospheric water-vapor absorption band. 
+              Solar radiation at 1375 nm is virtually 100% absorbed in the troposphere before reaching the ground. 
+              In both cloudy and clear Sentinel-2 scenes, surface reflectance is near zero (10–25 DN). 
+              The resulting ultra-low MAE is physically authentic and reflects atmospheric absorption physics, not data fabrication.
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ===================================================================
+             SECTION 7: EXPORT / DOWNLOAD
+             =================================================================== -->
+        <section id="view-export" class="view-section">
+          
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Export & Download Outputs</h2>
+                <div class="card-subtitle">Export the reconstructed multispectral imagery and provenance logs.</div>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              
+              <div class="card" style="margin-bottom: 0; background: rgba(15, 23, 42, 0.6);">
+                <h3 style="color: var(--accent-cyan); font-size: 1.15rem; margin-bottom: 6px;">13-Band Multispectral NumPy Array</h3>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 16px;">
+                  Compressed array (.npz) containing the full 13-band surface reflectance array normalized to [0.0, 1.0] 
+                  with complete spectral metadata.
+                </p>
+                <a href="/api/export/npz" class="btn btn-primary btn-sm" download>📥 Download .npz Archive</a>
+              </div>
+
+              <div class="card" style="margin-bottom: 0; background: rgba(15, 23, 42, 0.6);">
+                <h3 style="color: #a5b4fc; font-size: 1.15rem; margin-bottom: 6px;">True-Color RGB Preview Image</h3>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 16px;">
+                  Standard 8-bit RGB preview (.png) extracted from bands B4, B3, B2 with standard 3.0x linear contrast stretch.
+                </p>
+                <a href="/api/export/png" class="btn btn-secondary btn-sm" download>📥 Download RGB .png</a>
+              </div>
+
+              <div class="card" style="margin-bottom: 0; background: rgba(15, 23, 42, 0.6);">
+                <h3 style="color: #34d399; font-size: 1.15rem; margin-bottom: 6px;">Provenance Manifest</h3>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 16px;">
+                  Execution manifest (.json) tracking exact input timestamps, sensing dates, temporal baseline hours, CRS, and evaluation metrics.
+                </p>
+                <a href="/api/export/manifest" class="btn btn-secondary btn-sm" download>📥 Download Manifest .json</a>
+              </div>
+
+              <div class="card" style="margin-bottom: 0; background: rgba(15, 23, 42, 0.6);">
+                <h3 style="color: #f472b6; font-size: 1.15rem; margin-bottom: 6px;">Reconstruction Summary Report</h3>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 16px;">
+                  Markdown summary report (.md) detailing model configuration, hardware telemetry, input properties, and quantitative metrics.
+                </p>
+                <a href="/api/export/report" class="btn btn-secondary btn-sm" download>📥 Download Report .md</a>
+              </div>
+
+            </div>
+          </div>
+
+        </section>
+
+
+        <!-- ===================================================================
+             SECTION 8: HISTORICAL BENCHMARKS (MUNICH & MUMBAI)
+             =================================================================== -->
+        <section id="view-benchmarks" class="view-section">
+          
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Verified Historical Experimental Benchmarks</h2>
+                <div class="card-subtitle">End-to-end CPU inference results across geographically diverse satellite footprints.</div>
+              </div>
+            </div>
+
+            <!-- Munich Benchmark -->
+            <div class="card" style="background: rgba(15, 23, 42, 0.5); margin-bottom: 20px;">
+              <h3 style="color: var(--accent-cyan); font-size: 1.2rem; margin-bottom: 6px;">1. Munich, Germany Benchmark (256x256, EPSG:32632)</h3>
+              <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 14px;">
+                Target: 100% thick cumulus cloud cover (2023-07-12) | Sentinel-1 SAR: 2023-07-10 (-41.2 hrs) | Clear Reference: 2023-06-25 (-17 days).
+              </p>
+              
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Metric</th>
+                    <th>Cloudy Input vs Reference</th>
+                    <th>ECRformer-Light</th>
+                    <th>DSen2-CR (CARL)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Inference Latency (CPU)</td>
+                    <td>N/A</td>
+                    <td class="mono" style="color: var(--accent-cyan); font-weight: 600;">4,373 ms (~4.37 s)</td>
+                    <td class="mono">10,309 ms (~10.31 s)</td>
+                  </tr>
+                  <tr>
+                    <td>Output Reflectance Range</td>
+                    <td class="mono">[0.0378, 1.0032]</td>
+                    <td class="mono">[0.0011, 0.4686]</td>
+                    <td class="mono">[0.0000, 0.6465]</td>
+                  </tr>
+                  <tr>
+                    <td>Multispectral MAE</td>
+                    <td class="mono">0.0384</td>
+                    <td class="mono" style="color: var(--accent-emerald); font-weight: 600;">0.0157</td>
+                    <td class="mono">0.0201</td>
+                  </tr>
+                  <tr>
+                    <td>Multispectral RMSE</td>
+                    <td class="mono">0.0492</td>
+                    <td class="mono" style="color: var(--accent-emerald); font-weight: 600;">0.0241</td>
+                    <td class="mono">0.0297</td>
+                  </tr>
+                  <tr>
+                    <td>True-Color RGB PSNR</td>
+                    <td class="mono">24.12 dB</td>
+                    <td class="mono" style="color: var(--accent-cyan); font-weight: 600;">32.95 dB</td>
+                    <td class="mono">31.99 dB</td>
+                  </tr>
+                  <tr>
+                    <td>True-Color RGB SSIM</td>
+                    <td class="mono">0.5412</td>
+                    <td class="mono" style="color: var(--accent-cyan); font-weight: 600;">0.8604</td>
+                    <td class="mono">0.8323</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Mumbai Dadar Benchmark -->
+            <div class="card" style="background: rgba(15, 23, 42, 0.5); margin-bottom: 0;">
+              <h3 style="color: #a5b4fc; font-size: 1.2rem; margin-bottom: 6px;">2. Mumbai Dadar, India Benchmark (256x256, EPSG:32643)</h3>
+              <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 14px;">
+                Target: 99.58% heavy monsoon overcast (2023-06-16) | Sentinel-1 SAR: 2023-06-11 (5.2 days) | Clear Reference: 2023-06-06 (-10 days).
+              </p>
+              
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Metric</th>
+                    <th>Cloudy Input vs Reference</th>
+                    <th>ECRformer-Light</th>
+                    <th>DSen2-CR (CARL)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Inference Latency (CPU)</td>
+                    <td>N/A</td>
+                    <td class="mono" style="color: var(--accent-cyan); font-weight: 600;">3,915 ms (~3.91 s)</td>
+                    <td class="mono">11,687 ms (~11.69 s)</td>
+                  </tr>
+                  <tr>
+                    <td>Output Reflectance Range</td>
+                    <td class="mono">[0.0014, 0.9069]</td>
+                    <td class="mono">[0.0007, 0.6172]</td>
+                    <td class="mono">[0.0000, 0.5685]</td>
+                  </tr>
+                  <tr>
+                    <td>Multispectral MAE</td>
+                    <td class="mono">0.0412</td>
+                    <td class="mono">0.0258</td>
+                    <td class="mono" style="color: var(--accent-emerald); font-weight: 600;">0.0256</td>
+                  </tr>
+                  <tr>
+                    <td>Multispectral RMSE</td>
+                    <td class="mono">0.0561</td>
+                    <td class="mono" style="color: var(--accent-emerald); font-weight: 600;">0.0357</td>
+                    <td class="mono">0.0380</td>
+                  </tr>
+                  <tr>
+                    <td>True-Color RGB PSNR</td>
+                    <td class="mono">23.85 dB</td>
+                    <td class="mono" style="color: var(--accent-cyan); font-weight: 600;">29.62 dB</td>
+                    <td class="mono">29.08 dB</td>
+                  </tr>
+                  <tr>
+                    <td>True-Color RGB SSIM</td>
+                    <td class="mono">0.4912</td>
+                    <td class="mono" style="color: var(--accent-cyan); font-weight: 600;">0.6760</td>
+                    <td class="mono">0.6579</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+        </section>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
+
